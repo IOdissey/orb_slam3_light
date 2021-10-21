@@ -15,6 +15,7 @@ Build all (DBoW2, g2o, ORB_SLAM3, ros_orb_slam3):
 mkdir build
 cd build
 cmake <path to orb_slam3_light>
+make
 ```
 
 ### ros_orb_slam3

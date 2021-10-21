@@ -16,7 +16,7 @@ namespace publish
 {
 	ros::Publisher pose_pub;
 	ros::Publisher map_points_pub;
-	image_transport::Publisher rendered_image_pub;
+	// image_transport::Publisher rendered_image_pub;
 
 	std::string map_frame_id("world"), pose_frame_id("camera");
 
@@ -34,16 +34,16 @@ namespace publish
 		if (sensor_type == ORB_SLAM3::System::MONOCULAR || sensor_type == ORB_SLAM3::System::STEREO || sensor_type == ORB_SLAM3::System::RGBD)
 		{
 			tf_orb_to_ros.setValue(
-				0,  0,  1,
+				 0,  0,  1,
 				-1,  0,  0,
-				0, -1,  0);
+				 0, -1,  0);
 		}
 		else if (sensor_type == ORB_SLAM3::System::IMU_MONOCULAR || sensor_type == ORB_SLAM3::System::IMU_STEREO)
 		{
 			tf_orb_to_ros.setValue(
-				0,  1,  0,
+				 0,  1,  0,
 				-1,  0,  0,
-				0,  0,  1);
+				 0,  0,  1);
 		}
 		else
 		{
@@ -138,7 +138,7 @@ namespace publish
 			{
 				tf::Vector3 point_translation(map_points[i]->GetWorldPos().at<float> (0), map_points[i]->GetWorldPos().at<float> (1), map_points[i]->GetWorldPos().at<float> (2));
 				point_translation = tf_orb_to_ros * point_translation;
-				float data_array[num_channels] = {point_translation.x(), point_translation.y(), point_translation.z()};
+				float data_array[num_channels] = {(float)point_translation.x(), (float)point_translation.y(), (float)point_translation.z()};
 				memcpy(cloud_data_ptr+(i*cloud.point_step), data_array, num_channels*sizeof(float));
 			}
 		}
@@ -155,14 +155,14 @@ namespace publish
 		}
 	}
 
-	void publish_ros_tracking_img(cv::Mat image, ros::Time current_frame_time)
-	{
-		std_msgs::Header header;
-		header.stamp = current_frame_time;
-		header.frame_id = map_frame_id;
-		const sensor_msgs::ImagePtr rendered_image_msg = cv_bridge::CvImage(header, "bgr8", image).toImageMsg();
-		rendered_image_pub.publish(rendered_image_msg);
-	}
+	// void publish_ros_tracking_img(cv::Mat image, ros::Time current_frame_time)
+	// {
+	// 	std_msgs::Header header;
+	// 	header.stamp = current_frame_time;
+	// 	header.frame_id = map_frame_id;
+	// 	const sensor_msgs::ImagePtr rendered_image_msg = cv_bridge::CvImage(header, "bgr8", image).toImageMsg();
+	// 	rendered_image_pub.publish(rendered_image_msg);
+	// }
 
 	void publish_ros_tracking_mappoints(std::vector<ORB_SLAM3::MapPoint*> map_points, ros::Time current_frame_time)
 	{

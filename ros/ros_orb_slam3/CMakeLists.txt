@@ -10,7 +10,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 add_executable(${PROJECT_NAME} src/ros_orb_slam3.cpp)
-target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated)
 
 # Eigen3
 find_package(Eigen3 REQUIRED)
@@ -32,9 +31,8 @@ target_link_libraries(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/../../thirdparty/g2
 # orb_slam3
 include_directories("../../orb_slam3/include")
 target_link_libraries(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/../../orb_slam3/lib/liborb_slam3.so")
-# target_link_libraries(${PROJECT_NAME} -lboost_system)
 
 # catkin
-find_package(catkin REQUIRED COMPONENTS roscpp tf image_transport sensor_msgs cv_bridge)
+find_package(catkin REQUIRED COMPONENTS roscpp tf image_transport sensor_msgs)
 include_directories(${catkin_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
