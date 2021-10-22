@@ -6,7 +6,7 @@ This is fork of the [ORB_SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) without
 
 * [Eigen3](https://gitlab.com/libeigen/eigen/-/tags)
 * [OpenCV](https://opencv.org) (at least 3.0)
-* [ROS](http://wiki.ros.org/ROS/Installation) (for ros example)
+* [ROS](http://wiki.ros.org/ROS/Installation) (for ros example, required: roscpp, tf, image_transport, sensor_msgs)
 
 ### Build
 
@@ -29,5 +29,5 @@ cd orb_slam3_light/ros/ros_orb_slam3/bin
 
 The example config file is located:
 ```
-orb_slam3_light/ros/ros_orb_slam3/cfg.yaml
+orb_slam3_light/ros/ros_orb_slam3/cfg
 ```

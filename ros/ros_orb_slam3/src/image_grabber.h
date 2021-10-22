@@ -27,7 +27,7 @@ private:
 	bool _skip = false;
 	ros::Time _stamp;
 
-	bool _msg_mat(const sensor_msgs::ImageConstPtr& msg, cv::Mat& mat)
+	bool _msg_mat(const sensor_msgs::ImageConstPtr& msg, cv::Mat& mat, bool copy = true)
 	{
 		size_t size;
 		int type;
@@ -52,15 +52,14 @@ private:
 			std::cout << "sensor_msgs::Image is incorrect." << std::endl;
 			return false;
 		}
-		// Convert rgb8 to bgr8.
-		if (msg->encoding == "rgb8")
-			cv::cvtColor(cv::Mat(msg->height, msg->width, type, (void*)msg->data.data()), mat, cv::COLOR_RGB2BGR);
-		else
+		if (copy)
 		{
 			if (mat.cols != msg->width || mat.rows != msg->height || mat.type() != type)
 				mat = cv::Mat(msg->height, msg->width, type);
 			std::memcpy(mat.data, msg->data.data(), size);
 		}
+		else
+			mat = cv::Mat(msg->height, msg->width, type, (void*)msg->data.data());
 		return true;
 	}
 
@@ -123,7 +122,7 @@ public:
 		_sync->registerCallback(boost::bind(&ImageGrabber::_grab_stereo, this, _1, _2));
 	}
 
-	bool is_grab() const
+	const bool& is_grab() const
 	{
 		return _is_grub;
 	}
@@ -133,7 +132,7 @@ public:
 		_skip = skip;
 	}
 
-	ros::Time get_stamp() const
+	const ros::Time& get_stamp() const
 	{
 		return _stamp;
 	}
@@ -143,7 +142,7 @@ public:
 		if (!_is_grub)
 			return false;
 		_is_grub = false;
-		const bool ok = _msg_mat(_msg_left, img_left) && _msg_mat(_msg_right, img_right);
+		const bool ok = _msg_mat(_msg_left, img_left, false) && _msg_mat(_msg_right, img_right, false);
 		if (ok)
 		{
 			if (_do_equalize)

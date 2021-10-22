@@ -33,8 +33,8 @@ KeyFrame::KeyFrame():
 		mnTrackReferenceForFrame(0), mnFuseTargetForKF(0), mnBALocalForKF(0), mnBAFixedForKF(0), mnBALocalForMerge(0),
 		mnLoopQuery(0), mnLoopWords(0), mnRelocQuery(0), mnRelocWords(0), mnMergeQuery(0), mnMergeWords(0), mnBAGlobalForKF(0),
 		fx(0), fy(0), cx(0), cy(0), invfx(0), invfy(0), mnPlaceRecognitionQuery(0), mnPlaceRecognitionWords(0), mPlaceRecognitionScore(0),
-		mbf(0), mb(0), mThDepth(0), N(0), mvKeys(static_cast<vector<cv::KeyPoint> >(NULL)), mvKeysUn(static_cast<vector<cv::KeyPoint> >(NULL)),
-		mvuRight(static_cast<vector<float> >(NULL)), mvDepth(static_cast<vector<float> >(NULL)), /*mDescriptors(NULL),*/
+		mbf(0), mb(0), mThDepth(0), N(0), mvKeys(0), mvKeysUn(0),
+		mvuRight(0), mvDepth(0), /*mDescriptors(NULL),*/
 		/*mBowVec(NULL), mFeatVec(NULL),*/ mnScaleLevels(0), mfScaleFactor(0),
 		mfLogScaleFactor(0), mvScaleFactors(0), mvLevelSigma2(0),
 		mvInvLevelSigma2(0), mnMinX(0), mnMinY(0), mnMaxX(0),

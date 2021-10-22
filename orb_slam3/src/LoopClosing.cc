@@ -101,7 +101,7 @@ void LoopClosing::Run()
 						cv::Mat mTcw = mpCurrentKF->GetPose();
 						g2o::Sim3 gScw1(Converter::toMatrix3d(mTcw.rowRange(0, 3).colRange(0, 3)),Converter::toVector3d(mTcw.rowRange(0, 3).col(3)),1.0);
 						g2o::Sim3 gSw2c = mg2oMergeSlw.inverse();
-						g2o::Sim3 gSw1m = mg2oMergeSlw;
+						// g2o::Sim3 gSw1m = mg2oMergeSlw;
 
 						mSold_new = (gSw2c * gScw1);
 
@@ -314,11 +314,11 @@ bool LoopClosing::NewDetectCommonRegions()
 	//Check the last candidates with geometric validation
 	// Loop candidates
 	bool bLoopDetectedInKF = false;
-	bool bCheckSpatial = false;
+	// bool bCheckSpatial = false;
 
 	if(mnLoopNumCoincidences > 0)
 	{
-		bCheckSpatial = true;
+		// bCheckSpatial = true;
 		// Find from the last KF candidates
 		cv::Mat mTcl = mpCurrentKF->GetPose() * mpLoopLastCurrentKF->GetPoseInverse();
 		g2o::Sim3 gScl(Converter::toMatrix3d(mTcl.rowRange(0, 3).colRange(0, 3)),Converter::toVector3d(mTcl.rowRange(0, 3).col(3)),1.0);
@@ -414,7 +414,7 @@ bool LoopClosing::NewDetectCommonRegions()
 	}
 
 	const vector<KeyFrame*> vpConnectedKeyFrames = mpCurrentKF->GetVectorCovisibleKeyFrames();
-	const DBoW2::BowVector &CurrentBowVec = mpCurrentKF->mBowVec;
+	// const DBoW2::BowVector &CurrentBowVec = mpCurrentKF->mBowVec;
 
 	// Extract candidates from the bag of words
 	vector<KeyFrame*> vpMergeBowCand, vpLoopBowCand;
@@ -512,7 +512,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(std::vector<KeyFrame*> &vpBowCand, 
 
 	ORBmatcher matcherBoW(0.9, true);
 	ORBmatcher matcher(0.75, true);
-	int nNumGuidedMatching = 0;
+	// int nNumGuidedMatching = 0;
 
 	KeyFrame* pBestMatchedKF;
 	int nBestMatchesReproj = 0;
@@ -547,7 +547,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(std::vector<KeyFrame*> &vpBowCand, 
 		std::vector<MapPoint*> vpMatchedPoints = std::vector<MapPoint*>(mpCurrentKF->GetMapPointMatches().size(), static_cast<MapPoint*>(NULL));
 		std::vector<KeyFrame*> vpKeyFrameMatchedMP = std::vector<KeyFrame*>(mpCurrentKF->GetMapPointMatches().size(), static_cast<KeyFrame*>(NULL));
 
-		int nIndexMostBoWMatchesKF=0;
+		// int nIndexMostBoWMatchesKF=0;
 		for(int j=0; j<vpCovKFi.size(); ++j)
 		{
 			if(!vpCovKFi[j] || vpCovKFi[j]->isBad())
@@ -557,7 +557,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(std::vector<KeyFrame*> &vpBowCand, 
 			if (num > nMostBoWNumMatches)
 			{
 				nMostBoWNumMatches = num;
-				nIndexMostBoWMatchesKF = j;
+				// nIndexMostBoWMatchesKF = j;
 			}
 		}
 
@@ -612,7 +612,7 @@ bool LoopClosing::DetectCommonRegionsFromBoW(std::vector<KeyFrame*> &vpBowCand, 
 			{
 				vpCovKFi.clear();
 				vpCovKFi = pMostBoWMatchesKF->GetBestCovisibilityKeyFrames(nNumCovisibles);
-				int nInitialCov = vpCovKFi.size();
+				// int nInitialCov = vpCovKFi.size();
 				vpCovKFi.push_back(pMostBoWMatchesKF);
 				set<KeyFrame*> spCheckKFs(vpCovKFi.begin(), vpCovKFi.end());
 
@@ -651,9 +651,9 @@ bool LoopClosing::DetectCommonRegionsFromBoW(std::vector<KeyFrame*> &vpBowCand, 
 					// Optimize Sim3 transformation with every matches
 					Eigen::Matrix<double, 7, 7> mHessian7x7;
 
-					bool bFixedScale = mbFixScale;
-					if(mpTracker->mSensor==System::IMU_MONOCULAR && !mpCurrentKF->GetMap()->GetIniertialBA2())
-						bFixedScale=false;
+					// bool bFixedScale = mbFixScale;
+					// if(mpTracker->mSensor==System::IMU_MONOCULAR && !mpCurrentKF->GetMap()->GetIniertialBA2())
+					// 	bFixedScale=false;
 
 					int numOptMatches = Optimizer::OptimizeSim3(mpCurrentKF, pKFi, vpMatchedMP, gScm, 10, mbFixScale, mHessian7x7, true);
 
@@ -732,13 +732,13 @@ bool LoopClosing::DetectCommonRegionsFromBoW(std::vector<KeyFrame*> &vpBowCand, 
 	else
 	{
 		int maxStage = -1;
-		int maxMatched;
+		// int maxMatched;
 		for(int i=0; i<vnStage.size(); ++i)
 		{
 			if(vnStage[i] > maxStage)
 			{
 				maxStage = vnStage[i];
-				maxMatched = vnMatchesStage[i];
+				// maxMatched = vnMatchesStage[i];
 			}
 		}
 
@@ -1555,7 +1555,7 @@ void LoopClosing::MergeLocal2()
 {
 	cout << "Merge detected!!!!" << endl;
 
-	int numTemporalKFs = 11; //TODO (set by parameter): Temporal KFs in the local window if the map is inertial.
+	// int numTemporalKFs = 11; //TODO (set by parameter): Temporal KFs in the local window if the map is inertial.
 
 	//Relationship to rebuild the essential graph, it is used two times, first in the local window and later in the rest of the map
 	KeyFrame* pNewChild;
@@ -1568,7 +1568,7 @@ void LoopClosing::MergeLocal2()
 	// NonCorrectedSim3[mpCurrentKF]=mg2oLoopScw;
 
 	// Flag that is true only when we stopped a running BA, in this case we need relaunch at the end of the merge
-	bool bRelaunchBA = false;
+	// bool bRelaunchBA = false;
 
 	cout << "Check Full Bundle Adjustment" << endl;
 	// If a Global Bundle Adjustment is running, abort it
@@ -1584,7 +1584,7 @@ void LoopClosing::MergeLocal2()
 			mpThreadGBA->detach();
 			delete mpThreadGBA;
 		}
-		bRelaunchBA = true;
+		// bRelaunchBA = true;
 	}
 
 	cout << "Request Stop Local Mapping" << endl;
@@ -1608,14 +1608,14 @@ void LoopClosing::MergeLocal2()
 
 		mpLocalMapper->EmptyQueue();
 
-		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+		// std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 		bool bScaleVel=false;
 		if(s_on!=1)
 			bScaleVel=true;
 		mpAtlas->GetCurrentMap()->ApplyScaledRotation(R_on,s_on,bScaleVel,t_on);
 		mpTracker->UpdateFrameIMU(s_on,mpCurrentKF->GetImuBias(),mpTracker->GetLastKeyFrame());
 
-		std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
+		// std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
 	}
 
 	const int numKFnew=pCurrentMap->KeyFramesInMap();
@@ -1772,7 +1772,8 @@ void LoopClosing::SearchAndFuse(const KeyFrameAndPose &CorrectedPosesMap, vector
 		cv::Mat cvScw = Converter::toCvMat(g2oScw);
 
 		vector<MapPoint*> vpReplacePoints(vpMapPoints.size(),static_cast<MapPoint*>(NULL));
-		int numFused = matcher.Fuse(pKFi,cvScw,vpMapPoints,4,vpReplacePoints);
+		// int numFused = matcher.Fuse(pKFi,cvScw,vpMapPoints,4,vpReplacePoints);
+		matcher.Fuse(pKFi,cvScw,vpMapPoints,4,vpReplacePoints);
 
 		// Get Map Mutex
 		unique_lock<mutex> lock(pMap->mMutexMapUpdate);

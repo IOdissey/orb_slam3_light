@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME} src/ros_orb_slam3.cpp)
 # Eigen3
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
+add_definitions(-DEIGEN_NO_DEPRECATED_WARNING)
 
 # OpenCV
 find_package(OpenCV REQUIRED)

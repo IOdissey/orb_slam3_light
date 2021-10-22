@@ -362,7 +362,7 @@ void Map::PrintEssentialGraph()
 	vector<KeyFrame*> vpOriginKFs = mvpKeyFrameOrigins;
 	int count=0;
 	cout << "Number of origin KFs: " << vpOriginKFs.size() << endl;
-	KeyFrame* pFirstKF;
+	KeyFrame* pFirstKF = nullptr;
 	for(KeyFrame* pKFi : vpOriginKFs)
 	{
 		if(!pFirstKF)
@@ -370,6 +370,8 @@ void Map::PrintEssentialGraph()
 		else if(!pKFi->GetParent())
 			pFirstKF = pKFi;
 	}
+	if (!pFirstKF)
+		return;
 	if(pFirstKF->GetParent())
 	{
 		cout << "First KF in the essential graph has a parent, which is not possible" << endl;
@@ -408,7 +410,7 @@ bool Map::CheckEssentialGraph(){
 	vector<KeyFrame*> vpOriginKFs = mvpKeyFrameOrigins;
 	int count=0;
 	cout << "Number of origin KFs: " << vpOriginKFs.size() << endl;
-	KeyFrame* pFirstKF;
+	KeyFrame* pFirstKF = nullptr;
 	for(KeyFrame* pKFi : vpOriginKFs)
 	{
 		if(!pFirstKF)
@@ -416,6 +418,8 @@ bool Map::CheckEssentialGraph(){
 		else if(!pKFi->GetParent())
 			pFirstKF = pKFi;
 	}
+	if(!pFirstKF)
+		return false;
 	cout << "Checking if the first KF has parent" << endl;
 	if(pFirstKF->GetParent())
 	{

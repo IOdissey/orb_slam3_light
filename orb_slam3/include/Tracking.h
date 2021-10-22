@@ -68,6 +68,7 @@ public:
 	// cv::Mat GrabImageImuMonocular(const cv::Mat &im, const double &timestamp);
 
 	void GrabImuData(const IMU::Point &imuMeasurement);
+	void GrabImuData(const std::vector<IMU::Point> &vImuMeas);
 
 	void SetLocalMapper(LocalMapping* pLocalMapper);
 	void SetLoopClosing(LoopClosing* pLoopClosing);
@@ -307,9 +308,6 @@ protected:
 
 	//Motion Model
 	cv::Mat mVelocity;
-
-	//Color order (true RGB, false BGR, ignored if grayscale)
-	bool mbRGB;
 
 	list<MapPoint*> mlpTemporalPoints;
 

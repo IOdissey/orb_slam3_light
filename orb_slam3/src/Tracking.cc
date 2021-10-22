@@ -961,14 +961,6 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
 
 	cout << "- fps: " << fps << endl;
 
-	int nRGB = fSettings["Camera.RGB"];
-	mbRGB = nRGB;
-
-	if(mbRGB)
-		cout << "- color order: RGB (ignored if grayscale)" << endl;
-	else
-		cout << "- color order: BGR (ignored if grayscale)" << endl;
-
 	if(mSensor==System::STEREO || mSensor==System::RGBD || mSensor==System::IMU_STEREO)
 	{
 		float fx = mpCamera->getParameter(0);
@@ -1228,29 +1220,13 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
 
 	if(mImGray.channels()==3)
 	{
-		if(mbRGB)
-		{
-			cvtColor(mImGray,mImGray,cv::COLOR_RGB2GRAY);
-			cvtColor(imGrayRight,imGrayRight,cv::COLOR_RGB2GRAY);
-		}
-		else
-		{
-			cvtColor(mImGray,mImGray,cv::COLOR_BGR2GRAY);
-			cvtColor(imGrayRight,imGrayRight,cv::COLOR_BGR2GRAY);
-		}
+		cvtColor(mImGray,mImGray,cv::COLOR_BGR2GRAY);
+		cvtColor(imGrayRight,imGrayRight,cv::COLOR_BGR2GRAY);
 	}
 	else if(mImGray.channels()==4)
 	{
-		if(mbRGB)
-		{
-			cvtColor(mImGray,mImGray,cv::COLOR_RGBA2GRAY);
-			cvtColor(imGrayRight,imGrayRight,cv::COLOR_RGBA2GRAY);
-		}
-		else
-		{
-			cvtColor(mImGray,mImGray,cv::COLOR_BGRA2GRAY);
-			cvtColor(imGrayRight,imGrayRight,cv::COLOR_BGRA2GRAY);
-		}
+		cvtColor(mImGray,mImGray,cv::COLOR_BGRA2GRAY);
+		cvtColor(imGrayRight,imGrayRight,cv::COLOR_BGRA2GRAY);
 	}
 
 	if (mSensor == System::STEREO && !mpCamera2)
@@ -1281,19 +1257,9 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 	cv::Mat imDepth = imD;
 
 	if(mImGray.channels()==3)
-	{
-		if(mbRGB)
-			cvtColor(mImGray,mImGray,cv::COLOR_RGB2GRAY);
-		else
-			cvtColor(mImGray,mImGray,cv::COLOR_BGR2GRAY);
-	}
+		cvtColor(mImGray,mImGray,cv::COLOR_BGR2GRAY);
 	else if(mImGray.channels()==4)
-	{
-		if(mbRGB)
-			cvtColor(mImGray,mImGray,cv::COLOR_RGBA2GRAY);
-		else
-			cvtColor(mImGray,mImGray,cv::COLOR_BGRA2GRAY);
-	}
+		cvtColor(mImGray,mImGray,cv::COLOR_BGRA2GRAY);
 
 	if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
 		imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
@@ -1317,19 +1283,9 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
 	mImGray = im;
 
 	if(mImGray.channels()==3)
-	{
-		if(mbRGB)
-			cvtColor(mImGray,mImGray,cv::COLOR_RGB2GRAY);
-		else
-			cvtColor(mImGray,mImGray,cv::COLOR_BGR2GRAY);
-	}
+		cvtColor(mImGray,mImGray,cv::COLOR_BGR2GRAY);
 	else if(mImGray.channels()==4)
-	{
-		if(mbRGB)
-			cvtColor(mImGray,mImGray,cv::COLOR_RGBA2GRAY);
-		else
-			cvtColor(mImGray,mImGray,cv::COLOR_BGRA2GRAY);
-	}
+		cvtColor(mImGray,mImGray,cv::COLOR_BGRA2GRAY);
 
 	if (mSensor == System::MONOCULAR)
 	{
@@ -1368,6 +1324,13 @@ void Tracking::GrabImuData(const IMU::Point &imuMeasurement)
 {
 	unique_lock<mutex> lock(mMutexImuQueue);
 	mlQueueImuData.push_back(imuMeasurement);
+}
+
+void Tracking::GrabImuData(const std::vector<IMU::Point> &vImuMeas)
+{
+	unique_lock<mutex> lock(mMutexImuQueue);
+	for (size_t i_imu = 0; i_imu < vImuMeas.size(); ++i_imu)
+		mlQueueImuData.push_back(vImuMeas[i_imu]);
 }
 
 void Tracking::PreintegrateIMU()
@@ -1755,7 +1718,7 @@ void Tracking::Track()
 	else
 	{
 		// System is initialized. Track Frame.
-		bool bOK;
+		bool bOK = false;
 
 #ifdef REGISTER_TIMES
 		std::chrono::steady_clock::time_point time_StartPosePred = std::chrono::steady_clock::now();
@@ -2770,7 +2733,7 @@ bool Tracking::TrackLocalMap()
 				aux2++;
 		}
 
-	int inliers;
+	// int inliers;
 	if (!mpAtlas->isImuInitialized())
 		Optimizer::PoseOptimization(&mCurrentFrame);
 	else
@@ -2785,12 +2748,14 @@ bool Tracking::TrackLocalMap()
 			if(!mbMapUpdated)
 			{
 				Verbose::PrintMess("TLM: PoseInertialOptimizationLastFrame ", Verbose::VERBOSITY_DEBUG);
-				inliers = Optimizer::PoseInertialOptimizationLastFrame(&mCurrentFrame); // , !mpLastKeyFrame->GetMap()->GetIniertialBA1());
+				// inliers = Optimizer::PoseInertialOptimizationLastFrame(&mCurrentFrame); // , !mpLastKeyFrame->GetMap()->GetIniertialBA1());
+				Optimizer::PoseInertialOptimizationLastFrame(&mCurrentFrame);
 			}
 			else
 			{
 				Verbose::PrintMess("TLM: PoseInertialOptimizationLastKeyFrame ", Verbose::VERBOSITY_DEBUG);
-				inliers = Optimizer::PoseInertialOptimizationLastKeyFrame(&mCurrentFrame); // , !mpLastKeyFrame->GetMap()->GetIniertialBA1());
+				// inliers = Optimizer::PoseInertialOptimizationLastKeyFrame(&mCurrentFrame); // , !mpLastKeyFrame->GetMap()->GetIniertialBA1());
+				Optimizer::PoseInertialOptimizationLastKeyFrame(&mCurrentFrame);
 			}
 		}
 	}
@@ -3210,7 +3175,8 @@ void Tracking::SearchLocalPoints()
 		if(mState==LOST || mState==RECENTLY_LOST) // Lost for less than 1 second
 			th=15;
 
-		int matches = matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th, mpLocalMapper->mbFarPoints, mpLocalMapper->mThFarPoints);
+		// int matches = matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th, mpLocalMapper->mbFarPoints, mpLocalMapper->mThFarPoints);
+		matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th, mpLocalMapper->mbFarPoints, mpLocalMapper->mThFarPoints);
 	}
 }
 
@@ -3747,7 +3713,7 @@ void Tracking::InformOnlyTracking(const bool &flag)
 void Tracking::UpdateFrameIMU(const float s, const IMU::Bias &b, KeyFrame* pCurrentKeyFrame)
 {
 	Map * pMap = pCurrentKeyFrame->GetMap();
-	unsigned int index = mnFirstFrameId;
+	// unsigned int index = mnFirstFrameId;
 	list<ORB_SLAM3::KeyFrame*>::iterator lRit = mlpReferences.begin();
 	list<bool>::iterator lbL = mlbLost.begin();
 	for(list<cv::Mat>::iterator lit=mlRelativeFramePoses.begin(),lend=mlRelativeFramePoses.end();lit!=lend;lit++, lRit++, lbL++)

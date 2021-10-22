@@ -470,10 +470,10 @@ int ORBmatcher::SearchByProjection(KeyFrame* pKF, cv::Mat Scw, const vector<MapP
 		vector<MapPoint*> &vpMatched, int th, float ratioHamming)
 {
 	// Get Calibration Parameters for later projection
-	const float &fx = pKF->fx;
-	const float &fy = pKF->fy;
-	const float &cx = pKF->cx;
-	const float &cy = pKF->cy;
+	// const float &fx = pKF->fx;
+	// const float &fy = pKF->fy;
+	// const float &cx = pKF->cx;
+	// const float &cy = pKF->cy;
 
 	// Decompose Scw
 	cv::Mat sRcw = Scw.rowRange(0,3).colRange(0,3);
@@ -1452,7 +1452,7 @@ int ORBmatcher::SearchForTriangulation(KeyFrame *pKF1, KeyFrame *pKF2, cv::Mat F
 		cv::Mat t2w = pKF2->GetTranslation();
 		cv::Mat C2 = R2w*Cw+t2w;
 
-		cv::Point2f ep = pKF2->mpCamera->project(C2);
+		// cv::Point2f ep = pKF2->mpCamera->project(C2);
 
 		cv::Mat R1w = pKF1->GetRotation();
 		cv::Mat t1w = pKF1->GetTranslation();
@@ -1649,10 +1649,10 @@ int ORBmatcher::Fuse(KeyFrame *pKF, const vector<MapPoint *> &vpMapPoints, const
 		pCamera = pKF->mpCamera;
 	}
 
-	const float &fx = pKF->fx;
-	const float &fy = pKF->fy;
-	const float &cx = pKF->cx;
-	const float &cy = pKF->cy;
+	// const float &fx = pKF->fx;
+	// const float &fy = pKF->fy;
+	// const float &cx = pKF->cx;
+	// const float &cy = pKF->cy;
 	const float &bf = pKF->mbf;
 
 	int nFused=0;
@@ -1831,10 +1831,10 @@ int ORBmatcher::Fuse(KeyFrame *pKF, const vector<MapPoint *> &vpMapPoints, const
 int ORBmatcher::Fuse(KeyFrame *pKF, cv::Mat Scw, const vector<MapPoint *> &vpPoints, float th, vector<MapPoint *> &vpReplacePoint)
 {
 	// Get Calibration Parameters for later projection
-	const float &fx = pKF->fx;
-	const float &fy = pKF->fy;
-	const float &cx = pKF->cx;
-	const float &cy = pKF->cy;
+	// const float &fx = pKF->fx;
+	// const float &fy = pKF->fy;
+	// const float &cx = pKF->cx;
+	// const float &cy = pKF->cy;
 
 	// Decompose Scw
 	cv::Mat sRcw = Scw.rowRange(0,3).colRange(0,3);
@@ -2212,8 +2212,8 @@ int ORBmatcher::SearchBySim3(KeyFrame *pKF1, KeyFrame *pKF2, vector<MapPoint*> &
 					cv::Mat x3Dw = pMP->GetWorldPos();
 					cv::Mat x3Dc = Rcw*x3Dw+tcw;
 
-					const float xc = x3Dc.at<float>(0);
-					const float yc = x3Dc.at<float>(1);
+					// const float xc = x3Dc.at<float>(0);
+					// const float yc = x3Dc.at<float>(1);
 					const float invzc = 1.0/x3Dc.at<float>(2);
 
 					if(invzc<0)

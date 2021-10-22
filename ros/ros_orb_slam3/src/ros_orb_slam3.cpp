@@ -95,21 +95,23 @@ int main(int argc, char **argv)
 	// Main loop.
 	cv::Mat img_left, img_right;
 	std::vector<ORB_SLAM3::IMU::Point> imu_meas;
+	ros::Time beg_time;
 	while (is_run && ros::ok())
 	{
+		const auto beg = std::chrono::steady_clock::now();
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		ros::spinOnce();
 		//
 		if (!image_grabber->is_grab())
 			continue;
-		const auto beg = std::chrono::steady_clock::now();
 		const ros::Time current_stamp = image_grabber->get_stamp();
-		const double current_time = current_stamp.toSec();
+		if (beg_time.isZero())
+			beg_time = current_stamp;
 		// Sync imu.
 		if (imu_grabber->use_imu())
 		{
 			std::queue<sensor_msgs::ImuConstPtr>& imu_buf = imu_grabber->get_imu();
-			if (imu_buf.empty() || current_time > imu_buf.back()->header.stamp.toSec())
+			if (imu_buf.empty() || current_stamp > imu_buf.back()->header.stamp)
 			{
 				// Do not receive new messages.
 				image_grabber->set_skip(true);
@@ -117,9 +119,9 @@ int main(int argc, char **argv)
 			}
 			// Load imu measurements from buffer.
 			imu_meas.clear();
-			while (!imu_buf.empty() && imu_buf.front()->header.stamp.toSec() <= current_time)
+			while (!imu_buf.empty() && imu_buf.front()->header.stamp <= current_stamp)
 			{
-				double t = imu_buf.front()->header.stamp.toSec();
+				double t = (imu_buf.front()->header.stamp - beg_time).toSec();
 				cv::Point3f acc(imu_buf.front()->linear_acceleration.x, imu_buf.front()->linear_acceleration.y, imu_buf.front()->linear_acceleration.z);
 				cv::Point3f gyr(imu_buf.front()->angular_velocity.x, imu_buf.front()->angular_velocity.y, imu_buf.front()->angular_velocity.z);
 				imu_meas.push_back(ORB_SLAM3::IMU::Point(acc, gyr, t));
@@ -131,21 +133,18 @@ int main(int argc, char **argv)
 		if (!image_grabber->get_stereo(img_left, img_right))
 			continue;
 		//
-		cv::Mat pos;
-		if (imu_grabber->use_imu())
-			pos = slam.TrackStereo(img_left, img_right, current_time, imu_meas);
-		else
-			pos = slam.TrackStereo(img_left, img_right, current_time);
+		const double current_time = (current_stamp - beg_time).toSec();
+		cv::Mat pos = slam.TrackStereo(img_left, img_right, current_time, imu_meas);
 
 		publish::publish_ros_pose_tf(pos, current_stamp, slam_type);
 		publish::publish_ros_tracking_mappoints(slam.GetTrackedMapPoints(), current_stamp);
+
+		ros::spinOnce();
 
 		const auto end = std::chrono::steady_clock::now();
 		double dt = std::chrono::duration_cast<std::chrono::nanoseconds>(end - beg).count() * 1e-9;
 		if (log_time)
 			std::cout << "Process time: " << dt << std::endl;
-
-		ros::spinOnce();
 	}
 
 	ros::shutdown();

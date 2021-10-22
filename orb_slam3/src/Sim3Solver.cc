@@ -474,7 +474,7 @@ void Sim3Solver::Project(const vector<cv::Mat> &vP3Dw, vector<cv::Mat> &vP2D, cv
 	for(size_t i=0, iend=vP3Dw.size(); i<iend; i++)
 	{
 		cv::Mat P3Dc = Rcw*vP3Dw[i]+tcw;
-		const float invz = 1/(P3Dc.at<float>(2));
+		// const float invz = 1/(P3Dc.at<float>(2));
 		const float x = P3Dc.at<float>(0);
 		const float y = P3Dc.at<float>(1);
 		const float z = P3Dc.at<float>(2);
@@ -490,7 +490,7 @@ void Sim3Solver::FromCameraToImage(const vector<cv::Mat> &vP3Dc, vector<cv::Mat>
 
 	for(size_t i=0, iend=vP3Dc.size(); i<iend; i++)
 	{
-		const float invz = 1/(vP3Dc[i].at<float>(2));
+		// const float invz = 1/(vP3Dc[i].at<float>(2));
 		const float x = vP3Dc[i].at<float>(0);
 		const float y = vP3Dc[i].at<float>(1);
 		const float z = vP3Dc[i].at<float>(2);

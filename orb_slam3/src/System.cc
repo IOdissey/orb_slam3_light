@@ -71,7 +71,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 		exit(-1);
 	}
 
-	bool loadedAtlas = false;
+	// bool loadedAtlas = false;
 
 	//----
 	//Load ORB Vocabulary
@@ -181,8 +181,9 @@ cv::Mat System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const
 	}
 
 	if (mSensor == System::IMU_STEREO)
-		for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
-			mpTracker->GrabImuData(vImuMeas[i_imu]);
+		// for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
+		// 	mpTracker->GrabImuData(vImuMeas[i_imu]);
+		mpTracker->GrabImuData(vImuMeas);
 
 	cv::Mat Tcw = mpTracker->GrabImageStereo(imLeft,imRight,timestamp,filename);
 
@@ -489,7 +490,7 @@ void System::SaveTrajectoryEuRoC(const string &filename)
 	}*/
 
 	vector<Map*> vpMaps = mpAtlas->GetAllMaps();
-	Map* pBiggerMap;
+	Map* pBiggerMap = nullptr;
 	int numMaxKFs = 0;
 	for(Map* pMap :vpMaps)
 	{
@@ -498,6 +499,11 @@ void System::SaveTrajectoryEuRoC(const string &filename)
 			numMaxKFs = pMap->GetAllKeyFrames().size();
 			pBiggerMap = pMap;
 		}
+	}
+	if (!pBiggerMap)
+	{
+		cout << "pBiggerMap not set! " << endl;
+		return;
 	}
 
 	vector<KeyFrame*> vpKFs = pBiggerMap->GetAllKeyFrames();

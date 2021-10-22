@@ -25,9 +25,6 @@ Camera.fps: 30.0
 # stereo baseline times fx
 Camera.bf: 21.229568779101562
 
-# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
-Camera.RGB: 1
-
 # Close/Far threshold. Baseline times.
 ThDepth: 35.0
 
@@ -40,12 +37,56 @@ do_equalize: 1
 # Print process time.
 logTime: 1
 
+# ROS
+ROS.topic_left: "/d435/infra1/image_rect_raw"
+ROS.topic_right: "/d435/infra2/image_rect_raw"
+
+#--------------------------------------------------------------------------------------------
+# IMU Parameters
+#--------------------------------------------------------------------------------------------
+
+useIMU: 0
+
+# IMU noise
+IMU.NoiseGyro: 1.7e-04 # 1.6968e-04 
+IMU.NoiseAcc: 2.0e-03 # 2.0000e-3
+IMU.GyroWalk: 1.9393e-05 
+IMU.AccWalk: 3.e-03 # 3.0000e-3
+IMU.Frequency: 100
+
+# ROS
+ROS.topic_imu: ""
+
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# path to vocabulary
+vocabulary: "../../../vocabulary/ORBvoc.txt"
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 1200
+
+# ORB Extractor: Scale factor between levels in the scale pyramid 	
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid	
+ORBextractor.nLevels: 8
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast			
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+
 #--------------------------------------------------------------------------------------------
 # Stereo Rectification. Only if you need to pre-rectify the images.
 # Camera.fx, .fy, etc must be the same as in LEFT.P
 #--------------------------------------------------------------------------------------------
 
-# 
 do_rectify: 0
 
 LEFT.height: 480
@@ -137,50 +178,3 @@ Tbc: !!opencv-matrix
            0.0, 1.0, 0.0, -0.0051,
            0.0, 0.0, 1.0, -0.01174,
            0.0, 0.0, 0.0,  1.0]
-
-
-#--------------------------------------------------------------------------------------------
-# IMU Parameters
-#--------------------------------------------------------------------------------------------
-
-useIMU: 0
-
-# IMU noise
-IMU.NoiseGyro: 1.7e-04 # 1.6968e-04 
-IMU.NoiseAcc: 2.0e-03 # 2.0000e-3
-IMU.GyroWalk: 1.9393e-05 
-IMU.AccWalk: 3.e-03 # 3.0000e-3
-IMU.Frequency: 200
-
-
-#--------------------------------------------------------------------------------------------
-# ORB Parameters
-#--------------------------------------------------------------------------------------------
-
-# path to vocabulary
-vocabulary: "../../../vocabulary/ORBvoc.txt"
-
-# ORB Extractor: Number of features per image
-ORBextractor.nFeatures: 1200
-
-# ORB Extractor: Scale factor between levels in the scale pyramid 	
-ORBextractor.scaleFactor: 1.2
-
-# ORB Extractor: Number of levels in the scale pyramid	
-ORBextractor.nLevels: 8
-
-# ORB Extractor: Fast threshold
-# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
-# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
-# You can lower these values if your images have low contrast			
-ORBextractor.iniThFAST: 20
-ORBextractor.minThFAST: 7
-
-
-#--------------------------------------------------------------------------------------------
-# ROS Parameters
-#--------------------------------------------------------------------------------------------
-
-ROS.topic_imu: "/imu"
-ROS.topic_left: "/d435/infra1/image_rect_raw"
-ROS.topic_right: "/d435/infra2/image_rect_raw"
