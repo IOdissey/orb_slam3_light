@@ -38,8 +38,17 @@ do_equalize: 1
 logTime: 1
 
 # ROS
-ROS.topic_left: "/d435i/infra1/image_rect_raw"
-ROS.topic_right: "/d435i/infra2/image_rect_raw"
+topic_left: "/d435i/infra1/image_rect_raw"
+topic_right: "/d435i/infra2/image_rect_raw"
+
+
+#--------------------------------------------------------------------------------------------
+# ROS Publish
+#--------------------------------------------------------------------------------------------
+
+map_frame_id: "world"
+pose_frame_id: "camera"
+publish_map_points: 1
 
 
 #--------------------------------------------------------------------------------------------
@@ -56,7 +65,7 @@ IMU.AccWalk: 3.e-03 # 3.0000e-3
 IMU.Frequency: 200
 
 # ROS
-ROS.topic_imu: "/d435i/imu"
+topic_imu: "/d435i/imu"
 
 # Transformation from camera 0 to body-frame (imu)
 Tbc: !!opencv-matrix

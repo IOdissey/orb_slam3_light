@@ -8,6 +8,8 @@
 #include <message_filters/time_synchronizer.h>
 #include <sensor_msgs/Image.h>
 
+#include "ros_cv.h"
+
 
 class ImageGrabber
 {
@@ -26,42 +28,6 @@ private:
 	bool _is_grub = false;
 	bool _skip = false;
 	ros::Time _stamp;
-
-	bool _msg_mat(const sensor_msgs::ImageConstPtr& msg, cv::Mat& mat, bool copy = true)
-	{
-		size_t size;
-		int type;
-		if (msg->encoding == "mono8")
-		{
-			type = CV_8UC1;
-			size = msg->width * msg->height;
-		}
-		else if (msg->encoding == "bgr8" || msg->encoding == "rgb8")
-		{
-			type = CV_8UC3;
-			size = 3 * msg->width * msg->height;
-		}
-		else
-		{
-			std::cout << "sensor_msgs::Image format '" << msg->encoding << "' not supported." << std::endl;
-			return false;
-		}
-		// Check size.
-		if (msg->width < 1 || msg->height < 1 || size != msg->data.size())
-		{
-			std::cout << "sensor_msgs::Image is incorrect." << std::endl;
-			return false;
-		}
-		if (copy)
-		{
-			if (mat.cols != msg->width || mat.rows != msg->height || mat.type() != type)
-				mat = cv::Mat(msg->height, msg->width, type);
-			std::memcpy(mat.data, msg->data.data(), size);
-		}
-		else
-			mat = cv::Mat(msg->height, msg->width, type, (void*)msg->data.data());
-		return true;
-	}
 
 	void _grab_stereo(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::ImageConstPtr& msg_right)
 	{
@@ -114,8 +80,8 @@ public:
 			_clahe = cv::createCLAHE(3.0, cv::Size(8, 8));
 		// Topics.
 		std::string topic_left, topic_right;
-		settings["ROS.topic_left"] >> topic_left;
-		settings["ROS.topic_right"] >> topic_right;
+		settings["topic_left"] >> topic_left;
+		settings["topic_right"] >> topic_right;
 		_sub_left.subscribe(node, topic_left, 1);
 		_sub_right.subscribe(node, topic_right, 1);
 		_sync = std::make_unique<sync_t>(_sub_left, _sub_right, 10);
@@ -142,7 +108,7 @@ public:
 		if (!_is_grub)
 			return false;
 		_is_grub = false;
-		const bool ok = _msg_mat(_msg_left, img_left, false) && _msg_mat(_msg_right, img_right, false);
+		const bool ok = ros_cv::msg_mat(_msg_left, img_left, false) && ros_cv::msg_mat(_msg_right, img_right, false);
 		if (ok)
 		{
 			if (_do_equalize)

@@ -26,7 +26,7 @@ public:
 		if (_use_imu)
 		{
 			std::string topic_imu;
-			settings["ROS.topic_imu"] >> topic_imu;
+			settings["topic_imu"] >> topic_imu;
 			_sub_imu = node.subscribe(topic_imu, 1000, &ImuGrabber::_grab_imu, this);
 		}
 	}

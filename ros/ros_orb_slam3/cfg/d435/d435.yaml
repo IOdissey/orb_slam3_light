@@ -38,8 +38,18 @@ do_equalize: 1
 logTime: 1
 
 # ROS
-ROS.topic_left: "/d435/infra1/image_rect_raw"
-ROS.topic_right: "/d435/infra2/image_rect_raw"
+topic_left: "/d435/infra1/image_rect_raw"
+topic_right: "/d435/infra2/image_rect_raw"
+
+
+#--------------------------------------------------------------------------------------------
+# ROS Publish
+#--------------------------------------------------------------------------------------------
+
+map_frame_id: "world"
+pose_frame_id: "camera"
+publish_map_points: 1
+
 
 #--------------------------------------------------------------------------------------------
 # IMU Parameters
@@ -55,8 +65,7 @@ IMU.AccWalk: 3.e-03 # 3.0000e-3
 IMU.Frequency: 100
 
 # ROS
-ROS.topic_imu: ""
-
+topic_imu: ""
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters

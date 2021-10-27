@@ -76,6 +76,7 @@ int main(int argc, char **argv)
 	std::string vocabulary;
 	bool do_rectify = false;
 	bool log_time = false;
+	bool publish_map_points = false;
 	settings["vocabulary"] >> vocabulary;
 	settings["logTime"] >> log_time;
 	// Create SLAM system. It initializes all system threads and gets ready to process frames.
@@ -86,9 +87,7 @@ int main(int argc, char **argv)
 		slam_type = ORB_SLAM3::System::eSensor::STEREO;
 	ORB_SLAM3::System slam(vocabulary, argv[1], slam_type);
 	//
-	publish::pose_pub = node.advertise<geometry_msgs::PoseStamped>("/orb_slam3_ros/camera", 1);
-	publish::map_points_pub = node.advertise<sensor_msgs::PointCloud2>("/orb_slam3_ros/map_points", 1);
-	publish::setup_tf_orb_to_ros(slam_type);
+	Publish publish(settings, node, slam_type);
 	//
 	std::signal(SIGINT, handler);
 	std::cout << std::endl << "orb_slam3_ros started." << std::endl;
@@ -136,8 +135,7 @@ int main(int argc, char **argv)
 		const double current_time = (current_stamp - beg_time).toSec();
 		cv::Mat pos = slam.TrackStereo(img_left, img_right, current_time, imu_meas);
 
-		publish::publish_ros_pose_tf(pos, current_stamp, slam_type);
-		publish::publish_ros_tracking_mappoints(slam.GetTrackedMapPoints(), current_stamp);
+		publish.publish(pos, current_stamp, slam);
 
 		ros::spinOnce();
 
